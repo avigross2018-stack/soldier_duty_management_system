@@ -1,4 +1,5 @@
-def add_duty_to_soldier(soldier_id: int, duty_name: str, day: str) -> None:
+import utils
+def add_duty_to_soldier(soldier_id: int, duty_name: str, day: str, valid_days:list, soldiers:list) -> None:
     """
     מוסיפה תורנות חדשה לחייל.
     
@@ -22,10 +23,22 @@ def add_duty_to_soldier(soldier_id: int, duty_name: str, day: str) -> None:
     מבצעת בדיקות ומוסיפה תורנות לחייל.
     זורקת exceptions במקרה של שגיאה במקום להחזיר False.
     """
-    pass
+    exist_soldier = utils.find_soldier_by_id(soldier_id, soldiers)
+    if exist_soldier == None:
+        raise KeyError(f"{soldier_id} Not found")
+    exist_duty = utils.find_duty_by_name(exist_soldier['duties'],duty_name)
+    if exist_duty != None:
+        raise ValueError(f"{duty_name} already exist.")
+    valid_day = utils.is_valid_day(day, valid_days)
+    if not valid_day:
+        raise ValueError(f"{day} Invalid day!!")
+    soldier_index = soldiers.index(exist_soldier)
+    exist_soldier['duties'].append({"name" : duty_name.strip(), "day" : day.lower().strip(), "status" : "pending"})
+    soldiers[soldier_index] = exist_soldier
+    
 
 
-def update_duty_status(soldier_id: int, duty_name: str, new_status: str) -> None:
+def update_duty_status(soldier_id: int, duty_name: str, new_status: str, soldiers:list, valid_status:list) -> None:
     """
     מעדכנת את הסטטוס של תורנות.
     
@@ -49,10 +62,24 @@ def update_duty_status(soldier_id: int, duty_name: str, new_status: str) -> None
     מבצעת בדיקות ומעדכנת את הסטטוס.
     זורקת exceptions במקרה של שגיאה במקום להחזיר False.
     """
-    pass
+    exist_soldier = utils.find_soldier_by_id(soldier_id, soldiers)
+    if exist_soldier == None:
+        raise KeyError(f"{soldier_id} Not found")
+    exist_duty = utils.find_duty_by_name(exist_soldier['duties'],duty_name)
+    if exist_duty == None:
+        raise ValueError(f"{duty_name} not found.")
+    validate_status = utils.is_valid_status(new_status, valid_status)
+    if not validate_status:
+        raise ValueError(f'{new_status} Invalid status.')
+    # exist_duty["status"] = new_status.strip().lower()
+    for s in soldiers:
+        if s['id'] == soldier_id:
+            for d in s['duties']:
+                if d['name'] == duty_name:
+                    d['status'] = new_status
 
 
-def get_soldier_duties(soldier_id: int) -> list:
+def get_soldier_duties(soldier_id: int, soldiers:list) -> list:
     """
     מחזירה את רשימת התורנויות של חייל.
     
@@ -73,4 +100,7 @@ def get_soldier_duties(soldier_id: int) -> list:
     מפרידה בין הנתונים לבין הגישה אליהם.
     זורקת exception אם החייל לא קיים (במקום להחזיר רשימה ריקה).
     """
-    pass
+    exist_soldier = utils.find_soldier_by_id(soldier_id, soldiers)
+    if exist_soldier == None:
+        raise KeyError(f"{soldier_id} Not found")
+    return exist_soldier['duties']

@@ -1,4 +1,6 @@
-def add_soldier(soldier_id: int, name: str) -> None:
+import utils
+import data
+def add_soldier(soldier_id: int, name: str, soldiers:list) -> None:
     """
     מוסיפה חייל חדש למערכת.
     
@@ -21,10 +23,23 @@ def add_soldier(soldier_id: int, name: str) -> None:
     לא מטפלת בקלט/פלט - רק בלוגיקה.
     זורקת exceptions במקרה של שגיאה במקום להחזיר False.
     """
-    
+    existing_soldier = utils.find_soldier_by_id(soldier_id, soldiers)
+    if existing_soldier is not None:
+        raise ValueError(f"Soldier with ID {soldier_id} already exists.")
+        
+    if not utils.is_valid_name(name):
+        raise ValueError("The name is not valid.")
+        
+
+    soldiers.append({
+        "id": soldier_id, 
+        "name": name.strip(), 
+        "duties": []
+    })
 
 
-def remove_soldier(soldier_id: int) -> None:
+
+def remove_soldier(soldier_id: int, soldiers:list) -> None:
     """
     מסירה חייל מהמערכת לפי id.
     
@@ -44,10 +59,14 @@ def remove_soldier(soldier_id: int) -> None:
     מבצעת בדיקת קיום ומסירה מהנתונים.
     זורקת exception במקרה שהחייל לא קיים.
     """
-    pass
+    exist_soldier = utils.find_soldier_by_id(soldier_id, soldiers)
+    if exist_soldier == None:
+        raise KeyError(f"{soldier_id} Not found")
+    soldiers.remove(exist_soldier)
+    
 
 
-def get_all_soldiers() -> list:
+def get_all_soldiers(soldiers:list) -> list:
     """
     מחזירה את רשימת כל החיילים במערכת.
     
@@ -65,4 +84,4 @@ def get_all_soldiers() -> list:
     גישה לנתונים בצורה מבוקרת.
     מאפשר לקבל את הנתונים מבלי לגשת ישירות למשתנה הגלובלי.
     """
-    pass
+    return soldiers
